@@ -21,8 +21,8 @@ builder.Services.AddAuthentication(options =>
 .AddOpenIdConnect("oidc", options =>
 {
   options.SignInScheme = "Cookies";
-  options.Authority = Configuration["jwt:Authority"];
-  options.ClientId = Configuration["jwt:Audience"];
+  options.Authority = builder.Configuration["Service:SSO:Endpoint"];
+  options.ClientId = "InformingApi"; // builder.Configuration["jwt:Audience"];
   options.ResponseType = "code";
   options.Prompt = "login";
   options.GetClaimsFromUserInfoEndpoint = true;
@@ -44,12 +44,13 @@ if (app.Environment.IsDevelopment())
 
 }
 
+app.UseAuthentication();
 app.UseSwaggerAuthorized();
 app.UseSwagger();
-app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "SevureSwagger v1"));
-
-app.UseHttpsRedirection();
-
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SecureSwagger v1"));
+app.UseStaticFiles();
+app.UseCookiePolicy();
+app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
